@@ -1,0 +1,59 @@
+{
+    "compilerOptions": {
+        "baseUrl": ".",
+        // "types": ["vite/client"],
+        "target": "ES2016",
+        "useDefineForClassFields": true,
+        "module": "ESNext",
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+
+        /* Bundler mode */
+        "moduleResolution": "bundler",
+        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
+        "isolatedModules": true,
+        "noEmit": true,
+
+        //production
+        //"strict": true,
+        //"noUnusedLocals": true,
+        //"noUnusedParameters": true,
+
+        // devlopement
+        "noUnusedLocals": false,
+        "noUnusedParameters": false,
+        /* Linting */
+
+        "noFallthroughCasesInSwitch": true,
+        "paths": {
+            "@explicit.js.mvc/*": ["./src/explicit.js.mvc/*.ts"],
+            "@controller/*": ["./src/controllers/*.controller.ts"],
+            "@template/*": [
+                "./gen/components/*.dom.ts",
+                "./src/components/*.template.ts"
+            ],
+            "@template/layouts/*": [
+                "./gen/layouts/*.dom.ts",
+                "./src/layouts/*.template.ts"
+            ],
+            "@model/*": [
+                "./src/components/*.model.ts",
+                "./src/models/*.model.ts"
+            ],
+            "@model/layouts/*": ["./src/layouts/*.model.ts"],
+            "@viewModel/*": ["./src/controllers/*.view.model.ts"],
+            "@component/*": ["./src/components/*.component.ts"],
+            "@layout/*": ["./src/layouts/*.layout.ts"],
+            "@component/layouts/*": ["./src/layouts/*.component.ts"],
+            "@services/*": ["./src/services/*.service.ts"],
+            "@css/*": ["./public/css/*.css"]
+
+            // Add more paths as needed
+        } /* Ensure that casing is correct in imports. */
+    },
+    "include": ["src", "gen"]
+}
