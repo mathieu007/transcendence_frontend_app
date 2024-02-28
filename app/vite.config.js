@@ -1,7 +1,6 @@
 /** @type {import('vite').UserConfig} */
 import { defineConfig } from "vite";
 import tsconfigPaths from "vite-tsconfig-paths";
-import babel from "vite-plugin-babel";
 
 const htmlImport = {
   name: "htmlImport",
@@ -25,13 +24,7 @@ const htmlImport = {
 export default defineConfig({
     plugins: [
         tsconfigPaths(),
-        babel(),
-        htmlImport,
-        babel({
-            babelConfig: {
-                // Optional inline Babel config
-            }
-        })
+        htmlImport
     ],
     optimizeDeps: {
         esbuildOptions: {

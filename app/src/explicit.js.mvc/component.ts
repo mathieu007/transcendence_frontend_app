@@ -1,19 +1,19 @@
 import { Observable, type DomObservableModel } from "./observable";
-import {
-    Template,
-    type ComponentTemplate,
-    type TemplateNode
-} from "./template";
+import { Template, type ComponentTemplate } from "./template";
 
 export abstract class Component<TModel extends DomObservableModel> {
     public static htmlTagName: string | undefined;
     protected _template: Template<TModel>;
     private _referenceCounter: number = 0;
     protected _parentComponent: Component<TModel> | undefined;
-    private _model: TModel | undefined;
+    protected _model: TModel | undefined;
     private _content: Element | undefined = undefined;
-    private _contentVarName: string;
-
+    protected _beforeInsertNode: Comment;
+    public insertController(parentNode: Element): void {
+        const invisibleRoot: Comment = document.createComment("Controller node will follow here...");
+        parentNode.appendChild(invisibleRoot);
+        this._beforeInsertNode = invisibleRoot;
+    }
     set attributes(attributes: { name: string; value: string }[]) {
         attributes.forEach((item) => {
             this._template.rootElement.setAttribute(item.name, item.value);
@@ -25,25 +25,15 @@ export abstract class Component<TModel extends DomObservableModel> {
     }
 
     get model(): TModel {
-        if (this._model instanceof Observable)
-            return this._model.data as TModel;
-        return this._model as TModel;
+        return this._model;
     }
 
     get content(): Element {
         return this._content;
     }
 
-    set content(content: Element) {
-        this._content = content;
-    }
-
-    get contentVarName(): string {
-        return this._contentVarName;
-    }
-
-    set contentVarName(contentVarName: string) {
-        this._contentVarName = contentVarName;
+    public appendContentNode(content: Node) {
+        if (content !== undefined && this._content !== undefined) this._content.appendChild(content);
     }
 
     constructor(model: TModel, template: Template<TModel>) {
@@ -55,30 +45,20 @@ export abstract class Component<TModel extends DomObservableModel> {
         this._content = elemNode;
         this._domObserver();
         let myModel: TModel;
-        if (this._model instanceof Observable) myModel = this._model.data;
-        else myModel = this._model;
+        myModel = this._model;
         this._template.rootElement = this._template.generateTemplate(
             this,
             myModel,
-            this._content
+            this._content.childNodes.length > 0 ? this._content : undefined
         ) as ComponentTemplate;
         this._template.rootElement.is_component = true;
-        // this._session.menu_items.addCallback(this.onDataChange);
-        this.onInit();
     }
 
     protected onInit(): void {}
 
-    private _onNodeRemoval(
-        mutation: MutationRecord,
-        cls: Component<TModel>
-    ): void {
+    private _onNodeRemoval(mutation: MutationRecord, cls: Component<TModel>): void {
         if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
-            if (
-                Array.from(mutation.removedNodes).includes(
-                    cls._template.rootElement
-                )
-            ) {
+            if (Array.from(mutation.removedNodes).includes(cls._template.rootElement)) {
                 cls._referenceCounter--;
                 if (cls._referenceCounter === 0) {
                     cls.dispose();
@@ -91,11 +71,7 @@ export abstract class Component<TModel extends DomObservableModel> {
 
     private _onNodeAdd(mutation: MutationRecord, cls: Component<TModel>): void {
         if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-            if (
-                Array.from(mutation.addedNodes).includes(
-                    cls._template.rootElement
-                )
-            ) {
+            if (Array.from(mutation.addedNodes).includes(cls._template.rootElement)) {
                 cls._referenceCounter++;
             }
         }
@@ -161,10 +137,6 @@ export abstract class Component<TModel extends DomObservableModel> {
         // this.render();
         void oldValue;
         const key = String(propertyPath);
-        let model: TModel;
-        if (this._model instanceof Observable)
-            model = this._model.data as TModel;
-        else model = this._model as TModel;
-        model.updateDomNodes(key, newValue);
+        this._model.updateDomNodes(key, newValue);
     }
 }

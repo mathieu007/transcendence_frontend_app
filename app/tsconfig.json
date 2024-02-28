@@ -2,9 +2,9 @@
     "compilerOptions": {
         "baseUrl": ".",
         // "types": ["vite/client"],
-        "target": "ES2016",
+        "target": "ESNext",
         "useDefineForClassFields": true,
-        "module": "ESNext",
+        "module": "CommonJS",
         "lib": ["ESNext", "DOM", "DOM.Iterable"],
         "skipLibCheck": true,
         "experimentalDecorators": true,
@@ -12,7 +12,7 @@
         "esModuleInterop": true,
 
         /* Bundler mode */
-        "moduleResolution": "bundler",
+        // "moduleResolution": "bundler",
         "allowImportingTsExtensions": true,
         "resolveJsonModule": true,
         "isolatedModules": true,
@@ -30,30 +30,32 @@
 
         "noFallthroughCasesInSwitch": true,
         "paths": {
+            "@app": ["./src/app.ts"],
             "@explicit.js.mvc/*": ["./src/explicit.js.mvc/*.ts"],
             "@controller/*": ["./src/controllers/*.controller.ts"],
+            "@layout/*": ["./src/layouts/*.layout.ts"],
+            "@model/layout/*": ["./src/layouts/*.model.ts"],
+            "@template/layout/*": ["./gen/layouts/*.template.ts", "./src/layouts/*.template.ts"],
+            "@header/*": ["./src/headers/*.header.ts"],
+            "@model/header/*": ["./src/headers/*.model.ts"],
+            "@template/header/*": ["./gen/headers/*.template.ts", "./src/headers/*.template.ts"],
+            "@component/*": ["./src/components/*.component.ts"],
+            "@model/*": [
+                "./src/controllers/*.model.ts",
+                "./src/components/*.model.ts",
+                "./src/models/*.model.ts",
+                "./src/*.model.ts"
+            ],
             "@template/*": [
-                "./gen/components/*.dom.ts",
+                "./gen/controllers/*.template.ts",
+                "./gen/components/*.template.ts",
+                "./src/controllers/*.template.ts",
                 "./src/components/*.template.ts"
             ],
-            "@template/layouts/*": [
-                "./gen/layouts/*.dom.ts",
-                "./src/layouts/*.template.ts"
-            ],
-            "@model/*": [
-                "./src/components/*.model.ts",
-                "./src/models/*.model.ts"
-            ],
-            "@model/layouts/*": ["./src/layouts/*.model.ts"],
-            "@viewModel/*": ["./src/controllers/*.view.model.ts"],
-            "@component/*": ["./src/components/*.component.ts"],
-            "@layout/*": ["./src/layouts/*.layout.ts"],
-            "@component/layouts/*": ["./src/layouts/*.component.ts"],
             "@services/*": ["./src/services/*.service.ts"],
-            "@css/*": ["./public/css/*.css"]
-
-            // Add more paths as needed
-        } /* Ensure that casing is correct in imports. */
+            "@css/*": ["./css/*"]
+        }
     },
-    "include": ["src", "gen"]
+    "include": ["src", "gen"],
+    "exclude": ["src/explicit.js.mvc/packages"]
 }

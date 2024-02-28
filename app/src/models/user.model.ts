@@ -8,5 +8,3 @@ export class UserModel extends DomObservableModel {
     username: string = "";
     allowed: boolean = true;
 }
-
-Container.register("CurrentUser", UserModel);

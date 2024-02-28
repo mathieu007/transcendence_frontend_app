@@ -1,16 +1,13 @@
-import type { AppModel } from "@explicit.js.mvc/app.model";
-import {
-    Container,
-    inject,
-    injectionTarget
-} from "@explicit.js.mvc/di/container";
+import type { BaseAppModel } from "@explicit.js.mvc/base.app.model";
+import { Container, inject, injectionTarget } from "@explicit.js.mvc/di/container";
 import type { Layout } from "@explicit.js.mvc/layout";
 import { LayoutModel } from "@explicit.js.mvc/layout.model";
+import { AppModel } from "@model/app";
 
-@injectionTarget()
+// @injectionTarget()
 export class LayoutService {
     private _appModel: AppModel;
-    constructor(@inject("AppModel") appModel: AppModel) {
+    constructor(@inject("AppModel", AppModel) appModel: AppModel) {
         this._appModel = appModel;
     }
 
@@ -20,5 +17,3 @@ export class LayoutService {
         layout.template.generateTemplate(layout, layout.model);
     }
 }
-
-Container.register("LayoutService", LayoutService);

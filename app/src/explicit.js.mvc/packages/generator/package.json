@@ -1,0 +1,28 @@
+{
+  "name": "generator",
+  "packageManager": "yarn@4.1.0",
+  "type": "module",
+  "dependencies": {
+    "@types/htmlparser2": "^3.10.7",
+    "@types/jsdom": "^21.1.6",
+    "fb-watchman": "^2.0.2",
+    "htmlparser2": "^9.1.0",
+    "jsdom": "^24.0.0",
+    "ts-morph": "^21.0.1",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/fb-watchman": "^2",
+    "concurrently": "^8.2.2",
+    "dotenv": "^16.4.4"
+  },
+  "scripts": {
+    "controllers": "npx tsc && node ./dist/controllers.watcher.js",
+    "templates": "npx tsc && node ./dist/templates.watcher.js",
+    "dev": "concurrently \"npm:controllers\" \"npm:templates\""
+  },
+  "include": [
+    "src/**/*.ts"
+  ],
+  "compilerOptions": {}
+}

@@ -1,11 +1,9 @@
+import type { Layout } from "@explicit.js.mvc/layout";
 import { Component } from "./component";
-import { DomNodeModelBinding } from "./model.binding";
-import { Observable, type DomObservableModel } from "./observable";
+import { DomObservableModel } from "./observable";
+import type { LayoutModel } from "@explicit.js.mvc/layout.model";
 
-export function rawTemplate(
-    strings: TemplateStringsArray,
-    ...values: unknown[]
-): string {
+export function rawTemplate(strings: TemplateStringsArray, ...values: unknown[]): string {
     return strings.reduce((result, string, i) => {
         return result + string + (i < values.length ? `\${${values[i]}}` : "");
     }, "");
@@ -18,21 +16,8 @@ export function rawTemplateWithPlaceHolder(
 ): string {
     return strings.reduce((result, string, i) => {
         if (i <= 9)
-            return (
-                result +
-                string +
-                (i < values.length
-                    ? `<span class="neutral-span">${placeholder}0${i}</span>`
-                    : "")
-            );
-        else
-            return (
-                result +
-                string +
-                (i < values.length
-                    ? `<span class="neutral-span">${placeholder}${i}</span>`
-                    : "")
-            );
+            return result + string + (i < values.length ? `<span class="neutral-span">${placeholder}0${i}</span>` : "");
+        else return result + string + (i < values.length ? `<span class="neutral-span">${placeholder}${i}</span>` : "");
     }, "");
 }
 
@@ -41,10 +26,7 @@ function getNestedValue(obj: any, path: string): any {
     return pathArray.reduce((current, key) => current?.[key], obj);
 }
 
-export function fillTemplate(
-    template: string,
-    variables: { [key: string]: unknown }
-): string {
+export function fillTemplate(template: string, variables: { [key: string]: unknown }): string {
     // eslint-disable-next-line no-useless-escape
     return template.replace(/\$\{([\w.\[\]]+)\}/g, (match, path) => {
         const value = getNestedValue(variables, path);
@@ -71,13 +53,14 @@ export interface ComponentTemplate extends AppendElement {
 export type TemplateNode = ComponentTemplate | string;
 
 export abstract class Template<TModel extends DomObservableModel> {
-    private _templateElement: TemplateNode;
+    protected _templateElement: TemplateNode;
     constructor() {}
 
     public abstract generateTemplate(
         comp: Component<TModel>,
-        model: DomObservableModel,
-        content?: Element
+        model: TModel,
+        content?: Element,
+        layout?: Layout<LayoutModel>
     ): TemplateNode;
 
     get rootElement(): ComponentTemplate {
@@ -88,5 +71,4 @@ export abstract class Template<TModel extends DomObservableModel> {
         this._templateElement = template as ComponentTemplate;
         this._templateElement.is_component = true;
     }
-
 }

@@ -1,14 +1,10 @@
-import type { AppModel } from "@explicit.js.mvc/app.model";
 import { LayoutTemplate } from "@explicit.js.mvc/layout.template";
-import type { TemplateNode } from "@explicit.js.mvc/template";
+import { TemplateNode } from "@explicit.js.mvc/template";
 import type { DefaultLayout } from "@layout/default";
-import type { LayoutDefaultModel } from "@model/layouts/default";
+import { LayoutDefaultModel } from "@model/layout/default";
 
 export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
-    public generateTemplate(
-        layout: DefaultLayout,
-        model: LayoutDefaultModel
-    ): TemplateNode {
+    public generateTemplate(layout: DefaultLayout, model: LayoutDefaultModel): TemplateNode {
         return /*html*/ `
         <div>
         	<div class="trans-backgroud">
@@ -28,39 +24,40 @@ export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
         					<li><a href="/#about" class="nav-link px-2">About</a></li>
         					<li><a href="/#contact" class="nav-link px-2">Contact Us</a></li>
         				</ul>
-        				<ul class="nav col-md-3 justify-content-right text-end">
+        				<ul class="nav col-md-3 justify-content-end text-end">
         					<li>
-        						<a type="button" role="button" href="/#login"
+        						<a type="button" role="button" href="/login"
         							class="btn btn-outline-primary me-2">Login</a>
         					</li>
         					<li>
-        						<a type="button" role="button" href="/#signup" class="btn btn-primary">Sign-up</button>
+        						<a type="button" role="button" href="/#signup" class="btn btn-primary me-2">Sign-up</a>
         					</li>
         					<li>
-        						<div class="nav-item dropdown">
-        							<a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button"
+								<div style="height:100%" class="dropdown text-end d-flex align-items-center justify-content-center">
+									<a class="d-block mx-auto link-body-emphasis text-decoration-none dropdown-toggle" id="navbarDropdown" href="#" role="button"
         								data-bs-toggle="dropdown" aria-expanded="false"><i
-        									class="fa-regular fa-user fa-fw"></i></a>
-        							<ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-        								<li><a class="dropdown-item" href="/#settings">Settings</a></li>
-        								<li><a class="dropdown-item" href="/#activity">Activity Log</a></li>
-        								<li>
-        									<hr class="dropdown-divider" />
-        								</li>
-        								<li><a class="dropdown-item" href="/#logout">Logout</a></li>
-        							</ul>
-        						</div>
+        									class="fa-regular fa-user fa-fw"></i>
+									</a>
+									<ul class="dropdown-menu text-small" style="">
+										<li><a class="dropdown-item" href="#">New project...</a></li>
+										<li><a class="dropdown-item" href="#">Settings</a></li>
+										<li><a class="dropdown-item" href="#">Profile</a></li>
+										<li>
+											<hr class="dropdown-divider">
+										</li>
+										<li><a class="dropdown-item" href="#">Sign out</a></li>
+									</ul>
+								</div>
         					</li>
         				</ul>
         			</header>
         		</div>
         	</div>
         	<controller-component></controller-component>
-        	<link href="/css/styles.css" rel="stylesheet" />
+        	<!-- <link href="/css/styles.css" rel="stylesheet" /> -->
         	<link href="/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
         	<link href="/fontawesome/css/regular.min.css" rel="stylesheet" />
-        	<link href="/fontawesome/css/solid.min.css" rel="stylesheet" />
-        	<script type="module" src="/src/main.ts"></script>
+        	<link href="/fontawesome/css/solid.min.css" rel="stylesheet" />			
         </div>`;
     }
 }

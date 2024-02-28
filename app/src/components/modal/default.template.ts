@@ -21,7 +21,7 @@ export class ModalDefaultTemplate extends Template<ModalDefaultModel> {
         			<input change="${comp.event()}" type="checkbox" checked="${model.is_opened}" />
         		</div>
         		<div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
-        			<button-component click="${comp.close()}">Close</button-component>
+        			<button click="${comp.close()}">Close</button>
         		</div>
         	</div>
         </div>`;

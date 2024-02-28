@@ -1,4 +1,3 @@
-import { Container } from "@explicit.js.mvc/di/container";
 import { DataBinding } from "@explicit.js.mvc/model.binding";
 import { DomObservableModel } from "@explicit.js.mvc/observable";
 
@@ -20,5 +19,3 @@ export class ModalDefaultModel extends DomObservableModel {
     @DataBinding
     is_opened: boolean = false;
 }
-
-Container.register("ModalDefaultModel", ModalDefaultModel);

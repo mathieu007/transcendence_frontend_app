@@ -1,20 +1,17 @@
-import "./style.css";
-import "@css/styles";
+import "./scss/styles.scss";
 import { Popover } from "bootstrap";
-import { setupCounter } from "./counter.ts";
-import { AppModel } from "@explicit.js.mvc/app.model";
 import { Container } from "@explicit.js.mvc/di/container";
-import { DefaultLayout } from "@layout/default";
+import { App } from "@app";
+import { Routes } from "@explicit.js.mvc/routing/routes";
+import { QueryParameter, Router } from "@explicit.js.mvc/routing/router";
 import { HomeController } from "@controller/home/home";
-import { Router } from "@explicit.js.mvc/route/router";
-import { App } from "src/app.ts";
 
-let appModel: AppModel = Container.get<AppModel>(AppModel);
-appModel.active_layout = Container.get<DefaultLayout>(DefaultLayout);
-export const app = new App();
-Router.navigate("/home");
-
-setupCounter(document.querySelector<HTMLButtonElement>("#counter")!);
+Router.register("HomeController", HomeController);
+let routes = new Routes();
+App.routes = routes;
+Container.register("App", App);
+let home = Container.register("HomeController", HomeController);
+App.routes.home.testFilter(2, { page: 1, filter: "Math" });
 
 document.querySelectorAll('[data-bs-toggle="popover"]').forEach((popover) => {
     new Popover(popover);
@@ -31,9 +28,7 @@ window.addEventListener("DOMContentLoaded", (_event) => {
         sidebarToggle.addEventListener("click", (event) => {
             event.preventDefault();
             document.body.classList.toggle("sb-sidenav-toggled");
-            const str = new String(
-                document.body.classList.contains("sb-sidenav-toggled")
-            ).toString();
+            const str = new String(document.body.classList.contains("sb-sidenav-toggled")).toString();
             localStorage.setItem("sb|sidebar-toggle", str);
         });
     }

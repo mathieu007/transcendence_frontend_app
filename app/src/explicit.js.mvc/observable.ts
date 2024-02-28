@@ -15,33 +15,14 @@ export class DomObservableModel extends DomNodeModelBinding {
 }
 
 export class Observable<T extends DomNodeModelBinding> {
-    private _callbacks: Array<
-        (
-            data: T,
-            property: string | symbol,
-            oldValue: object,
-            newValue: object
-        ) => void
-    >;
+    private _callbacks: Array<(data: T, property: string | symbol, oldValue: object, newValue: object) => void>;
 
-    public getCallbacks(): Array<
-        (
-            data: T,
-            property: string | symbol,
-            oldValue: object,
-            newValue: object
-        ) => void
-    > {
+    public getCallbacks(): Array<(data: T, property: string | symbol, oldValue: object, newValue: object) => void> {
         return this._callbacks;
     }
     private _domNodeCallbacks: Map<
         string,
-        (
-            data: T,
-            property: string | symbol,
-            oldValue: object,
-            newValue: object
-        ) => void
+        (data: T, property: string | symbol, oldValue: object, newValue: object) => void
     > = new Map();
     private _data: T;
 
@@ -53,45 +34,21 @@ export class Observable<T extends DomNodeModelBinding> {
 
     // wacth out you can add the same callback multiple time.
     // it's your responsibility to ensure, you add the callback only once.
-    public addCallback(
-        callback: (
-            data: T,
-            property: string | symbol,
-            oldValue: object,
-            newValue: object
-        ) => void
-    ) {
+    public addCallback(callback: (data: T, property: string | symbol, oldValue: object, newValue: object) => void) {
         this._callbacks?.push(callback);
     }
 
-    public removeCallback(
-        callback: (
-            data: T,
-            property: string | symbol,
-            oldValue: object,
-            newValue: object
-        ) => void
-    ) {
+    public removeCallback(callback: (data: T, property: string | symbol, oldValue: object, newValue: object) => void) {
         removeByReference(this._callbacks, callback);
     }
 
-    protected updateDomNodeFunc(
-        data: T,
-        propertyPath: string | symbol,
-        oldValue: object,
-        newValue: object
-    ): void {
+    protected updateDomNodeFunc(data: T, propertyPath: string | symbol, oldValue: object, newValue: object): void {
         void oldValue;
         const key = String(propertyPath);
         data.updateDomNodes(key, newValue);
     }
 
-    private setArrayValue(
-        target: T & any[],
-        property: string,
-        newValue: any,
-        tryFireCallbacks: boolean
-    ) {
+    private setArrayValue(target: T & any[], property: string, newValue: any, tryFireCallbacks: boolean) {
         const index = Number(property);
         if (index >= target.length) {
             target.length = index + 1;
@@ -99,88 +56,41 @@ export class Observable<T extends DomNodeModelBinding> {
         const oldValue = target[index] as unknown;
         if (oldValue !== newValue) {
             target[index] = newValue;
-            this.fireCallBacks(
-                target,
-                property,
-                oldValue,
-                newValue,
-                tryFireCallbacks
-            );
+            this.fireCallBacks(target, property, oldValue, newValue, tryFireCallbacks);
         }
     }
 
-    private setObjectValue(
-        target: T,
-        property: string,
-        newValue: any,
-        tryFireCallbacks: boolean
-    ) {
+    private setObjectValue(target: T, property: string, newValue: any, tryFireCallbacks: boolean) {
         const oldValue = target[property as keyof T] as object;
         if (newValue !== oldValue) {
             target[property as keyof T] = newValue;
-            this.fireCallBacks(
-                target,
-                property,
-                oldValue,
-                newValue,
-                tryFireCallbacks
-            );
+            this.fireCallBacks(target, property, oldValue, newValue, tryFireCallbacks);
         }
     }
 
-    private setPrimitiveValue(
-        target: T,
-        property: string,
-        newValue: any,
-        tryFireCallbacks: boolean
-    ) {
+    private setPrimitiveValue(target: T, property: string, newValue: any, tryFireCallbacks: boolean) {
         if (newValue !== target[property as keyof T]) {
             const oldValue = target[property as keyof T] as unknown;
             target[property as keyof T] = newValue;
-            this.fireCallBacks(
-                target,
-                property,
-                oldValue,
-                newValue,
-                tryFireCallbacks
-            );
+            this.fireCallBacks(target, property, oldValue, newValue, tryFireCallbacks);
         }
     }
 
-    private setValueAny(
-        target: T,
-        property: string,
-        newValue: any,
-        tryFireCallbacks: boolean
-    ) {
+    private setValueAny(target: T, property: string, newValue: any, tryFireCallbacks: boolean) {
         // if (Array.isArray(target) && !isNaN(Number(property))) {
         //     this.setArrayValue(target, property, newValue, tryFireCallbacks);
-        // } 
-		if (isPrimitive(newValue)) {
-            this.setPrimitiveValue(
-                target,
-                property,
-                newValue,
-                tryFireCallbacks
-            );
+        // }
+        if (isPrimitive(newValue)) {
+            this.setPrimitiveValue(target, property, newValue, tryFireCallbacks);
         }
     }
 
-    private fireCallBacks(
-        target: T,
-        property: string,
-        oldValue: any,
-        newValue: any,
-        tryFireCallbacks: boolean
-    ): void {
+    private fireCallBacks(target: T, property: string, oldValue: any, newValue: any, tryFireCallbacks: boolean): void {
         if (tryFireCallbacks) {
             this._callbacks.forEach((callback) => {
                 callback(target, property, oldValue, newValue);
             });
-            if (
-                target.hasDomNodeBinders(property) &&
-                !this._domNodeCallbacks.has(property)
-            ) {
+            if (target.hasDomNodeBinders(property) && !this._domNodeCallbacks.has(property)) {
                 this._domNodeCallbacks.set(property, this.updateDomNodeFunc);
             }
             const domNodeUpdateCallback = this._domNodeCallbacks.get(property);
@@ -193,9 +103,7 @@ export class Observable<T extends DomNodeModelBinding> {
     public hasDomNodeBinding(objName: string, propertyName: string): boolean {
         return (
             !DomNodeModelBinding.includedProperties.has(objName) ||
-            DomNodeModelBinding.includedProperties
-                .get(objName)
-                ?.indexOf(propertyName) === -1
+            DomNodeModelBinding.includedProperties.get(objName)?.indexOf(propertyName) === -1
         );
     }
 
@@ -207,11 +115,8 @@ export class Observable<T extends DomNodeModelBinding> {
                 const propertyName = String(property);
                 if (!this.hasDomNodeBinding(objName, propertyName)) {
                     this.setValueAny(target, propertyName, value, false);
-                    // } else if (
-                    //     Array.isArray(target) &&
-                    //     !isNaN(Number(propertyName))
-                    // ) {
-                    //     this.setArrayValue(target, propertyName, value, true);
+                } else if (Array.isArray(target) && property === "length") {
+                    this.setObjectValue(target, propertyName, value, true);
                 } else if (isPrimitive(value)) {
                     this.setPrimitiveValue(target, propertyName, value, true);
                 } else if (isObjectType(value)) {

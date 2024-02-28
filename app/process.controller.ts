@@ -5,12 +5,11 @@ function processControllerFile(controllerFilePath: string): void {
     const appFilePath = process.env.APP_FILE_PATH || "./src/app.ts";
     const appClassName = process.env.APP_CLASS_NAME || "App";
     const project = new Project({
-        tsConfigFilePath: "tsconfig.json"
+        tsConfigFilePath: "tsconfig.gen.json"
     });
 
     // Add or get the controller source file
-    const controllerSourceFile =
-        project.addSourceFileAtPath(controllerFilePath);
+    const controllerSourceFile = project.addSourceFileAtPath(controllerFilePath);
     const className = controllerSourceFile.getClasses()[0]?.getName();
     const appSourceFile = project.addSourceFileAtPath(controllerFilePath);
 
@@ -32,9 +31,7 @@ function processControllerFile(controllerFilePath: string): void {
     // Check if the field already exists in the class
     const existingProperty = appClass.getProperty(fieldName);
     if (existingProperty) {
-        console.log(
-            `The field '${fieldName}' already exists in ${appClassName}.`
-        );
+        console.log(`The field '${fieldName}' already exists in ${appClassName}.`);
         return;
     }
 
@@ -42,7 +39,7 @@ function processControllerFile(controllerFilePath: string): void {
     appClass.addProperty({
         name: fieldName,
         type: fieldType,
-        initializer: `Container.register(${fieldType})`
+        initializer: `Container.register("${fieldType}", ${fieldType})`
     });
 
     // Save changes

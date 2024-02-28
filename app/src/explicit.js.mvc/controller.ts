@@ -1,25 +1,35 @@
 import type { LayoutModel } from "@explicit.js.mvc/layout.model";
-import type { AppModel } from "@explicit.js.mvc/app.model";
 import type { DomObservableModel } from "@explicit.js.mvc/observable";
 import type { Layout } from "@explicit.js.mvc/layout";
-
+import { Component } from "@explicit.js.mvc/component";
+import type { Template } from "@explicit.js.mvc/template";
+import type { BaseApp } from "@explicit.js.mvc/base.app.container";
+import type { Header } from "@explicit.js.mvc/header";
+import type { HeaderModel } from "@explicit.js.mvc/header.model";
 
 export abstract class Controller<
-    TAppModel extends AppModel,
+    TApp extends BaseApp,
+    THeader extends Header<HeaderModel>,
     TLayout extends Layout<LayoutModel>,
     TControllerModel extends DomObservableModel
-> {
-    protected _app: TAppModel;
+> extends Component<TControllerModel> {
+    protected _app: TApp;
     protected _layout: TLayout;
-    protected _model: TControllerModel | undefined;
+    protected _header: THeader;
 
-    constructor(app: TAppModel, layout: TLayout, model?: TControllerModel) {
+    constructor(
+        app: TApp,
+        header: THeader,
+        layout: TLayout,
+        model: TControllerModel,
+        template: Template<TControllerModel>
+    ) {
+        super(model, template);
         this._app = app;
         this._layout = layout;
-        this._model = model;
-        this.app.active_controller = this;
+        this._header = header;
     }
-    get app(): TAppModel {
+    get app(): TApp {
         return this._app;
     }
     get layout(): TLayout {
@@ -30,5 +40,8 @@ export abstract class Controller<
     }
     get model(): TControllerModel | undefined {
         return this._model;
+    }
+    get header(): THeader | undefined {
+        return this._header;
     }
 }

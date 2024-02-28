@@ -1,30 +1,27 @@
-import type {
-    ComponentTemplate,
-    TemplateNode
-} from "@explicit.js.mvc/template";
-import type { Controller } from "@explicit.js.mvc/controller";
+import { Template, type ComponentTemplate, type TemplateNode } from "@explicit.js.mvc/template";
 import type { DomObservableModel } from "@explicit.js.mvc/observable";
-import type { LayoutModel } from "@explicit.js.mvc/layout.model";
-import type { AppModel } from "@explicit.js.mvc/app.model";
 import type { Layout } from "@explicit.js.mvc/layout";
+import type { Component } from "@explicit.js.mvc/component";
+import type { LayoutModel } from "@explicit.js.mvc/layout.model";
 
-export abstract class ControllerTemplate {
-    private _templateElement: TemplateNode;
-    constructor() {}
+export abstract class ControllerTemplate<TModel extends DomObservableModel> extends Template<TModel> {
+    constructor() {
+        super();
+    }
+
     public abstract generateTemplate(
-        controller: Controller<
-            AppModel,
-            Layout<LayoutModel>,
-            DomObservableModel
-        >,
-        layout?: Layout<LayoutModel>,
-        model?: DomObservableModel
+        comp: Component<TModel>,
+        model: TModel,
+        content?: Element,
+        layout?: Layout<LayoutModel>
     ): TemplateNode;
 
-    get template(): ComponentTemplate {
+    get rootElement(): ComponentTemplate {
         return this._templateElement as ComponentTemplate;
     }
-    set template(template: ComponentTemplate) {
-        this._templateElement = template;
+
+    set rootElement(template: Element) {
+        this._templateElement = template as ComponentTemplate;
+        this._templateElement.is_component = true;
     }
 }

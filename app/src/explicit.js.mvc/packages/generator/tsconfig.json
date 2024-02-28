@@ -1,0 +1,16 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "module": "ESNext",
+        "lib": ["ESNext", "DOM", "DOM.Iterable"],
+        "skipLibCheck": true,
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true,
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "isolatedModules": true,
+        "noEmit": false,
+        "outDir": "dist"
+    },
+    "include": ["src/**/*"]
+}

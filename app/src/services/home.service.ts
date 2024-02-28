@@ -1,6 +1,6 @@
 import { injectionTarget } from "@explicit.js.mvc/di/container";
 
-@injectionTarget()
+// @injectionTarget()
 export class HomeService {
     // constructor(@inject(""))
 }

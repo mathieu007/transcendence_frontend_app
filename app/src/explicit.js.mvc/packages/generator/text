@@ -1,0 +1,11 @@
+watchman -j <<EOT                                                                                     
+[
+    "trigger", "/home/math/projects/transcendence/transcendence/frontend_app/app/src/controllers", {
+        "name": "typescript-compile",
+        "expression": ["allof", ["match", "*.controller.ts"], ["type", "f"]],
+        "command": ["node", "/home/math/projects/transcendence/transcendence/frontend_app/app/src/explicit.js.mvc/packages/generator/src/process.controllers.js"]
+    }
+]
+EOT
+
+node /home/math/projects/transcendence/transcendence/frontend_app/app/src/explicit.js.mvc/packages/generator/src/process.controllers.js

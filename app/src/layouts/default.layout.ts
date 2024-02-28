@@ -1,22 +1,17 @@
-import type { AppModel } from "@explicit.js.mvc/app.model";
-import {
-    Container,
-    inject,
-    injectionTarget
-} from "@explicit.js.mvc/di/container";
+import { BaseAppModel } from "@explicit.js.mvc/base.app.model";
+import { inject, injectionTarget } from "@explicit.js.mvc/di/container";
 import { Layout } from "@explicit.js.mvc/layout";
-import type { LayoutDefaultModel } from "@model/layouts/default";
-import type { LayoutDefaultTemplate } from "@template/layouts/default";
+import { AppModel } from "@model/app";
+import { LayoutDefaultModel } from "@model/layout/default";
+import { LayoutDefaultTemplate } from "@template/layout/default";
 
-@injectionTarget()
+// @injectionTarget()
 export class DefaultLayout extends Layout<LayoutDefaultModel> {
     constructor(
-        @inject("AppModel") app: AppModel,
-        @inject("LayoutDefaultModel") model: LayoutDefaultModel,
-        @inject("LayoutDefaultTemplate") template: LayoutDefaultTemplate
+        @inject("AppModel", AppModel) app: AppModel,
+        @inject("LayoutDefaultModel", LayoutDefaultModel) model: LayoutDefaultModel,
+        @inject("LayoutDefaultTemplate", LayoutDefaultTemplate) template: LayoutDefaultTemplate
     ) {
-        super(model, template);
+        super(app, model, template);
     }
 }
-
-Container.register("DefaultLayout", DefaultLayout);

@@ -1,0 +1,22 @@
+.trans-backgroud
+{
+    background-color: var(--bs-body-bg);
+    opacity: 90%;
+}
+
+@media (max-width: 700px) {
+  #centered-image {
+    position:absolute; top:0px;
+    z-index:-999;
+  }
+  
+  .centered-image-container 
+  {
+    min-height: 100vh;
+  }
+}
+
+#centered-image {
+    max-height: 100vh; /* Ensure the image does not exceed the viewport height */
+    object-fit: cover; /* Cover the container without losing the image's aspect ratio */
+}
