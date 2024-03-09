@@ -18,10 +18,10 @@ export class HomeController extends Controller<App, DefaultHeader, DefaultLayout
     ) {
         super(app, header, layout, model, template);
     }
-    // @Route("/")
-    // public index(): void {
-    //     console.log("HomeController.index()");
-    // }
+    @Route("/")
+    public index(): void {
+        console.log("HomeController.index()");
+    }
     // @Route("/test/${id}")
     // public test(id: number): void {
     //     console.log("HomeController.test(id)");

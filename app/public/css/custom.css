@@ -1,7 +1,103 @@
-.trans-backgroud
+/* .trans-backgroud
 {
     background-color: var(--bs-body-bg);
     opacity: 90%;
+} */
+
+.btn:focus, .btn:hover {
+  box-shadow: none;
+}
+
+.btn {
+  position: relative;
+  overflow: hidden;
+  transition: color 0.4s ease; /* Transition for the text color */
+}
+
+#header-title {
+    height:100vh;
+    background-image: url(/assets/img/space-planet.jpg);
+    background-size: cover;
+    background-position: center center;
+    overflow: hidden;
+    background-repeat: no-repeat;
+    /* position: relative; */
+    top: 0px;
+    left: 0px;
+}
+
+.content-wrap {
+    padding: .1px;
+    margin: 0 auto;
+    overflow: hidden;
+    background: #1f1d29;
+    transition: transform .8s cubic-bezier(.2,1,.2,1), filter .3s ease-in-out;
+    transform: translateX(0);
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 2;
+  display: block;
+}
+.btn {
+  background-image: none !important;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 100%;
+  bottom: 0;
+  left: 0;
+  background-color: var(--bs-btn-hover-bg);
+  transition: right 0.4s ease;
+  z-index: 1;
+}
+
+.btn:hover::before {
+  right: 0;
+}
+
+.btn:hover
+{
+  color: var(--bs-light)!important;
+  background-color: transparent !important;
+  border-color: var(--bs-dark)!important; 
+}
+
+.btn-primary:hover
+{
+  color: var(--bs-dark)!important;
+  border-color: var(--bs-dark)!important;
+}
+
+.btn-primary::before {
+  background-color: white;
+  color: var(--bs-dark);
+}
+
+.btn:hover {
+  color: #007bff;
+}
+
+.btn span {
+  position: relative;
+  z-index: 1;
+}
+
+.btn.white
+{
+  background-color: #fff;
+  color: var(--bs-dark);
+  border: 1px solid #fff;
+}
+
+.btn 
+{
+  transform: skew(-4deg);
+  border-radius: 0.25rem !important;
 }
 
 @media (max-width: 700px) {

@@ -50,6 +50,11 @@ class RouteContainer {
 }
 
 class RouteData {
+
+    constructor(data?: Partial<RouteData>) {
+        Object.assign(this, data);
+    }
+
     // The url as specified from the Route("myurl") decorator function.
     public raw_url: string;
     public initialized: boolean = false;
@@ -144,39 +149,63 @@ function getParameters(urlParts: string[]): string[] {
     return arr;
 }
 
+function countUrlParts(urlsParts: string[]): number {
+    let count = 0;
+    if (urlsParts.length === 0) return 0;
+    urlsParts.forEach(e => {
+        if (e.trim() !== "")
+            count++;
+    });
+    if (count === 0)
+        count = 1;
+    return count;
+}
+
 function recursiveGetMatchingUrlFromMap(
     urlParts: string[],
     concatPathName: string,
     matches: Array<RouteData>
 ): Array<RouteData> | undefined {
-    urlParts.forEach((elem) => {
+    let partsCount = countUrlParts(urlParts);
+    let pI = 0;
+    for (pI = 0; pI < partsCount; pI++) {
+        let elem = urlParts[pI];
         let p = elem.trim();
         let currentUrl = concatPathName + "/" + p;
-        routes.forEach((routeArr, pathName) => {
+        for (let [pathName, routeArr] of routes) {
             if (pathName.startsWith(currentUrl)) {
-                routeArr.forEach((route) => {
+                for (var i = 0; i < routeArr.length; i++) {
+                    let route = routeArr[i];
                     matches.push(route);
-                });
-            }
-        });
-        if (matches.length === 0) {
-            currentUrl = concatPathName + "/" + paramPlaceholder;
-            routes.forEach((routeArr, pathName) => {
-                if (pathName.startsWith(currentUrl)) {
-                    routeArr.forEach((route) => {
-                        matches.push(route);
-                    });
+                    if (pathName === currentUrl && partsCount === 1) {
+                        return matches;
+                    }
                 }
-            });
+            }
+            if (matches.length === 0) {
+                currentUrl = concatPathName + "/" + paramPlaceholder;
+                for (let [pathName, routeArr] of routes) {
+                    if (pathName.startsWith(currentUrl)) {
+                        for (var i = 0; i < routeArr.length; i++) {
+                            let route = routeArr[i];
+                            matches.push(route);
+                            if (pathName === currentUrl && partsCount === 1) {
+                                return matches;
+                            }
+                        };
+                    }
+                }
+            }
+            if (matches.length === 0) return undefined;
+            urlParts = urlParts.splice(0, 1);
+            if (urlParts.length === 0)
+                return matches;
+            if (urlParts.length === 1 && urlParts[0].trim() === "")
+                return matches;
+            return recursiveGetMatchingUrl(urlParts, concatPathName, matches);
         }
-        if (matches.length === 0) return undefined;
-        urlParts = urlParts.splice(0, 1);
-        if (urlParts.length === 0) {
-            return matches;
-        }
-        return recursiveGetMatchingUrl(urlParts, concatPathName, matches);
-    });
-    return [];
+        return [];
+    }
 }
 
 function recursiveGetMatchingUrl(
@@ -185,21 +214,24 @@ function recursiveGetMatchingUrl(
     matches: Array<RouteData>
 ): Array<RouteData> | undefined {
     let matches2: Array<RouteData> = [];
-    urlParts.forEach((elem) => {
+    let partsCount = countUrlParts(urlParts);
+    let pI = 0;
+    for (pI = 0; pI < partsCount; pI++) {
+        let elem = urlParts[pI];
         let p = elem.trim();
         let currentUrl = concatPathName + "/" + p;
-        matches.forEach((route) => {
+        for (let route of matches) {
             if (route.signature.startsWith(currentUrl)) {
                 matches2.push(route);
             }
-        });
+        }
         if (matches2.length === 0) {
             currentUrl = concatPathName + "/" + paramPlaceholder;
-            matches.forEach((route) => {
+            for (let route of matches) {
                 if (route.signature.startsWith(currentUrl)) {
                     matches2.push(route);
                 }
-            });
+            };
         }
         if (matches2.length === 0) return undefined;
         urlParts = urlParts.splice(0, 1);
@@ -207,13 +239,13 @@ function recursiveGetMatchingUrl(
             return matches2;
         }
         return recursiveGetMatchingUrl(urlParts, currentUrl, matches2);
-    });
+    }
     return matches2;
 }
 
 // !important, without base address...
 function tryGetMatchingRoute(urlPathName: string): RouteData | undefined {
-    let urlParts = urlPathName.split("/");
+    let urlParts = urlPathName.split("/",);
     let concatPathName = "";
     let matches: Array<RouteData> = new Array();
     matches = recursiveGetMatchingUrlFromMap(urlParts, concatPathName, matches);
@@ -290,6 +322,8 @@ function findRoute(signature: string, pathRoutes: RouteData[]): RouteData | unde
     let queryStr = new URLSearchParams(url.search);
     if (pathRoutes !== undefined) {
         let keys = Array.from(queryStr.keys()).sort();
+        if (keys.length === 0)
+            return pathRoutes[0];
         let index = findBestMatchingRoute(pathRoutes, keys);
         if (index === -1) {
             return undefined;
@@ -357,6 +391,8 @@ function initRouting(target: any, callStack: CallStack, route: RouteData, origin
 function findBestMatchingRoute(routes: RouteData[], toFind: Array<string>): number {
     let maxMatches = 0;
     let bestMatchIndex = -1;
+    if (toFind.length === 0)
+        return 0;
     routes.forEach((item, index) => {
         const matches = item.queryMatches.filter((element) => toFind.includes(element)).length;
         if (matches > maxMatches) {
@@ -448,7 +484,6 @@ function updateLayoutController(route: RouteData): void {
     let container = route.getContainer();
     let controller = container.controller;
     let app = controller.instance.app;
-    
 
     if (app.model.active_header !== controller.instance.header || app.model.active_header === undefined) {
         app.model.active_header = controller.instance.header;
@@ -464,6 +499,7 @@ function updateLayoutController(route: RouteData): void {
     }
 }
 
+let firstLoad = true;
 function dispatchRouting(instance: any, originalMethod: any, callStack: CallStack, route: RouteData): number {
     if (originalMethod === callStack.lastMethod) {
         if (!callStack.initialized) {
@@ -486,7 +522,8 @@ function dispatchRouting(instance: any, originalMethod: any, callStack: CallStac
             includeQueryParams: true
         });
         updateLayoutController(route);
-        if (buildUrl !== currentUrl) {
+        if (buildUrl !== currentUrl || firstLoad) {
+            firstLoad = false;
             if (route.history) history.pushState(route, "", buildUrl);
             else history.replaceState(route, "", buildUrl);
             return -1;
@@ -690,7 +727,7 @@ export class Router {
         if (urlParts.length >= 2) {
             for (let i = 0; i < urlParts.length; i += 2) {
                 url += urlParts[i];
-                if (urlParts.length > i + 1) url += route.context.args[argIndex];
+                if (urlParts.length > i + 1 && !isObjectType(route.context.args[argIndex])) url += route.context.args[argIndex];
                 argIndex++;
             }
         } else {
@@ -738,6 +775,7 @@ export class Router {
         urlSearch.forEach((value, key) => {
             q[key] = value;
         });
+        route.context.queryParams = q;
         route.methodParams.forEach((p, i) => {
             let urlIndex = p.indexInUrl;
             if (p.type === "number") args.push(Number(urlArgs[urlIndex]));
@@ -750,11 +788,9 @@ export class Router {
         dispatchRoute(route);
     }
 
-    static invokeDynamicControllerMethod(className: string, methodName: string, ...args: any[]): void {
-        const instance = controllerInstances.get(className);
-        if (!instance) throw new Error(`Instance not found for class name: ${className}`);
+    static invokeDynamicControllerMethod(instance: any, methodName: string, args: (string | number | bigint | QueryParameter)[]): void {
         const method = instance[methodName];
-        if (typeof method !== "function") throw new Error(`Method ${methodName} not found on instance of ${className}`);
+        if (typeof method !== "function") throw new Error(`Method ${methodName} not found on instance of ${instance.constructor.name}`);
         return method.apply(instance, args);
     }
 
@@ -768,12 +804,12 @@ export class Router {
 function dispatchRoute(route: RouteData): void {
     updateLayoutController(route);
     let controller = route.getContainer().controller;
-    Router.invokeDynamicControllerMethod(controller.constructor.name, route.methodName, route.context.args);
+    Router.invokeDynamicControllerMethod(controller.instance, route.methodName, route.context.args);
 }
 
 window.addEventListener("popstate", function (e) {
-    if (e.state && e.state instanceof RouteData) {
-        let route = e.state;
+    if (e.state) {
+        let route = new RouteData(e.state);
         dispatchRoute(route);
     } else throw new Error("Unexpected state: " + e.state);
 });

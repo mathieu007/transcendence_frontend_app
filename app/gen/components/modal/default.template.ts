@@ -30,8 +30,8 @@ export class ModalDefaultTemplate extends Template<ModalDefaultModel> {
 		let rootElem_0_1_1_3 = document.createElement("button");
 		rootElem_0_1_1_3.setAttribute("type", "button");
 		rootElem_0_1_1_3.setAttribute("class", "btn-close");
-		const clickListener_4_0 = () => { comp.close(); }
-		Listeners.addClickListenerFunc(rootElem_0_1_1_3, "4_0", clickListener_4_0);
+		const clickListener_3_0 = () => { comp.close(); }
+		Listeners.addClickListenerFunc(rootElem_0_1_1_3, "3_0", clickListener_3_0);
 		rootElem_0_1_1_3.setAttribute("aria-label", "Close");
 		rootElem_0_1_1.appendChild(rootElem_0_1_1_3);
 		let rootElem_0_1_3 = document.createElement("div");
@@ -44,14 +44,14 @@ export class ModalDefaultTemplate extends Template<ModalDefaultModel> {
 		model.appendVarContentNode(rootElem_0_1_3_1, comp.content);
 		model.appendTextNode(rootElem_0_1_3_1, "");
 		let rootElem_0_1_3_3 = document.createElement("input");
-		const inputListener_4_1 = () => { comp.event(); }
-		Listeners.addInputListenerFunc(rootElem_0_1_3_3, "4_1", inputListener_4_1);
+		const inputListener_3_1 = () => { comp.event(); }
+		Listeners.addInputListenerFunc(rootElem_0_1_3_3, "3_1", inputListener_3_1);
 		rootElem_0_1_3_3.setAttribute("type", "input");
 		rootElem_0_1_3_3.setAttribute("value", "123 test");
 		rootElem_0_1_3.appendChild(rootElem_0_1_3_3);
 		let rootElem_0_1_3_5 = document.createElement("input");
-		const changeListener_4_2 = () => { comp.event(); }
-		Listeners.addChangeListenerFunc(rootElem_0_1_3_5, "4_2", changeListener_4_2);
+		const changeListener_3_2 = () => { comp.event(); }
+		Listeners.addChangeListenerFunc(rootElem_0_1_3_5, "3_2", changeListener_3_2);
 		rootElem_0_1_3_5.setAttribute("type", "checkbox");
 		model.addAttributeCallback(rootElem_0_1_3_5, "checked", "${model.is_opened}");
 		rootElem_0_1_3.appendChild(rootElem_0_1_3_5);
@@ -59,8 +59,8 @@ export class ModalDefaultTemplate extends Template<ModalDefaultModel> {
 		rootElem_0_1_5.setAttribute("class", "modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0");
 		rootElem_0_1.appendChild(rootElem_0_1_5);
 		let rootElem_0_1_5_1 = document.createElement("button");
-		const clickListener_4_3 = () => { comp.close(); }
-		Listeners.addClickListenerFunc(rootElem_0_1_5_1, "4_3", clickListener_4_3);
+		const clickListener_3_3 = () => { comp.close(); }
+		Listeners.addClickListenerFunc(rootElem_0_1_5_1, "3_3", clickListener_3_3);
 		rootElem_0_1_5.appendChild(rootElem_0_1_5_1);
 		model.appendTextNode(rootElem_0_1_5_1, "Close");
 		this.rootElement = rootElem_0;

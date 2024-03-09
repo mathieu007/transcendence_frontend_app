@@ -46,6 +46,13 @@ $offcanvas-box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.175);
 
 @import "bootstrap/scss/variables";
 
+@mixin background-opacity($color, $opacity) { 
+    background: $color;
+    background: rgba($color, $opacity); 
+}
+
+
+
 $white: #fff;
 $gray-100: #f8f9fa;
 $gray-200: #e9ecef;
@@ -266,9 +273,17 @@ $main-color: $blue;
 
   .active {
     font-weight: 600;
-
     .bi {
       display: block !important; // stylelint-disable-line declaration-no-important
     }
   }
+  
+}
+
+.trans-backgroud 
+{
+   @include background-opacity($body-bg-dark, 0.9);    
+   position: absolute;
+   width: 100%;
+   z-index: 100;
 }
