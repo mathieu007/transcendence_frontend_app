@@ -16,34 +16,71 @@ export function DataBinding(target: DomNodeModelBinding, propName: string) {
 }
 
 export class DomNodeBindSetter {
-    constructor(node: Node, setters: (elem: Node, value: any, name?: string) => void, attributeName?: string) {
+    constructor(
+        node: Node,
+        getter: (...args: any[]) => any,
+        setter: (elem: Node, value: any, name?: string) => void,
+        args: any[],
+        attributeName?: string,
+        originalValue?: string
+    ) {
+        this.args = args;
         this.node = node;
-        this.setter = setters;
+        this.getter = getter;
+        this.setter = setter;
         this.attributeName = attributeName;
+        this.originalValue = originalValue;
     }
+    public args: any[];
     public node: Node;
     public attributeName: string;
-    public setter: (elem: Node, value: any, name?: string) => void;
+    public originalValue: string;
+    public setter: (elem: Node, value: any, name?: string, originalValue?: string, ...args: any[]) => void;
+    public getter: (...args: any[]) => any;
 }
 
 export abstract class DomNodeModelBinding {
     static includedProperties: Map<string, Array<string>> = new Map();
+    private getters: Map<string, (...args: any[]) => any> = new Map();
     private _contentVarName: string;
     constructor() {}
+    private _modelVarName: string;
     private _bindingSetters: Map<string, Array<DomNodeBindSetter>> = new Map<string, Array<DomNodeBindSetter>>();
+
+    private _argsAreEqual(args: any[], args2: any[]): boolean {
+        if (args.length !== args2.length) {
+            return false;
+        }
+        for (let i = 0; i < args.length; i++) {
+            if (args[i] !== args2[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
 
     public setBinding(
         node: Node,
         propPath: string,
-        func: (elem: Node, value: any, name?: string) => void,
-        attrName?: string
+        funcGetter: (...args: any[]) => any,
+        args: any[],
+        funcSetter: (elem: Node, value: any, name?: string) => void,
+        attrName?: string,
+        originalValue?: string
     ): void {
+        let found = false;
         let binders = this._bindingSetters.get(propPath);
         if (binders === undefined) {
             binders = new Array<DomNodeBindSetter>();
             this._bindingSetters.set(propPath, binders);
         }
-        binders.push(new DomNodeBindSetter(node, func, attrName));
+        for (var i = 0; i < binders.length; i++) {
+            if (this._argsAreEqual(binders[i].args, args)) {
+                found = true;
+                break;
+            }
+        }
+        if (!found) binders.push(new DomNodeBindSetter(node, funcGetter, funcSetter, args, attrName, originalValue));
     }
 
     public getPropVal(path: string): any {
@@ -56,6 +93,10 @@ export abstract class DomNodeModelBinding {
         this._contentVarName = contentName;
     }
 
+    set modelVarName(modelVarName: string) {
+        this._modelVarName = modelVarName;
+    }
+
     // we do not need a content update function, no need binding function
     public appendVarContentNode(elem: Node, content: Element): void {
         elem.appendChild(content);
@@ -66,30 +107,71 @@ export abstract class DomNodeModelBinding {
         elem.appendChild(textNode);
     }
 
-    public addTextNodeCallback(elem: Node, varPath: string): void {
-        const val = this.getPropVal(varPath) as string;
-        const textNode = new Text(val);
-        elem.appendChild(textNode);
-        this.setBinding(textNode, varPath, this.updateTextNodeFunc);
+    public concatenatePrimitives(args) {
+        const primitives = args.filter((arg) => {
+            if (arg === null) return true;
+            const type = typeof arg;
+            return type !== "object" && type !== "function";
+        });
+        const primitiveStrings = primitives.map(String);
+        return primitiveStrings.join("_");
     }
 
-    public updateTextNodeFunc(elem: Node, varPath: string, value?: string): void {
-        if (!(elem instanceof Text)) throw new Error("Node is not a text node, cannot update content!");
-        elem.textContent = this.getPropVal(varPath) as string;
+    public addTextNodeCallback(elem: Node, varPath: string, getter: (...args: any[]) => any, ...args: any[]): void {
+        const val = getter(args);
+        let div = document.createElement("div");
+        div.innerHTML = val;
+        this.getters.set(varPath, getter);
+        elem.appendChild(div.firstChild);
+        this.setBinding(div.firstChild, varPath, getter, args, this.updateTextNodeFunc.bind(this));
     }
 
-    public addAttributeCallback(elem: Node, name: string, value: string): void {
-        this.updateAttributeValueFunc(elem, value, name);
-        this.setBinding(elem, value, this.updateAttributeValueFunc, name);
+    public updateTextNodeFunc(
+        elem: Node,
+        varPath: string,
+        value?: string,
+        originalValue?: string,
+        ...args: any[]
+    ): void {
+        let div = document.createElement("div");
+        div.innerHTML = this.getters.get(varPath)(args);
+        if (div.firstChild !== elem) elem.parentElement.replaceChild(div.firstChild, elem);
     }
 
-    public updateAttributeValueFunc(elem: Node, value: string, name?: string): void {
+    public addGetter(varPath: string, getter: (...args: any[]) => any): void {
+        this.getters.set(varPath, getter);
+    }
+
+    public addAttributeCallback(
+        elem: Node,
+        name: string,
+        value: string,
+        ...args: any[]
+    ): void {
+        const splits = (value as string).split(regex);
+        if (splits.length >= 3) {
+            for (let i = 0; i < splits.length; i += 2) {
+                let varPath = splits[i + 1];
+                let getter = this.getters.get(varPath);
+                this.setBinding(elem, varPath, getter, args, this.updateAttributeValueFunc.bind(this), name, value);
+            }
+        }
+        this.updateAttributeValueFunc(elem, value, name, value, args);
+    }
+
+    public updateAttributeValueFunc(
+        elem: Node,
+        value: string,
+        name?: string,
+        originalValue?: string,
+        ...args: any[]
+    ): void {
         if (!(elem instanceof Element)) throw new Error("Node is not an element, cannot update element!");
         const element = elem as Element;
-        const splits = (value as string).split(regex);
+        const splits = (originalValue as string).split(regex);
         let attrValue = "";
         for (let i = 0; i < splits.length; i++) {
-            if (i % 2 === 1) attrValue += this.getPropVal(splits[i]) as string;
+            if (i % 2 === 1) attrValue += this.getters.get(splits[i + 1])(args) as string;
             else attrValue += splits[i];
         }
         if (element.tagName === "input" && name === "checked")
@@ -109,7 +191,7 @@ export abstract class DomNodeModelBinding {
         const binders = this._bindingSetters.get(propPath);
         if (binders === undefined) return;
         binders.forEach((binder) => {
-            binder.setter(binder.node, value, binder.attributeName);
+            binder.setter(binder.node, value, binder.attributeName, binder.originalValue);
         });
     }
 }

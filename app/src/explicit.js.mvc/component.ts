@@ -9,20 +9,25 @@ export abstract class Component<TModel extends DomObservableModel> {
     protected _model: TModel | undefined;
     private _content: Element | undefined = undefined;
     protected _beforeInsertNode: Comment;
+    protected _afterInsertNode: Comment;
     public insertController(parentNode: Element): void {
-        const invisibleRoot: Comment = document.createComment("Controller node will follow here...");
+        const invisibleRoot: Comment = document.createComment("Controller node start here.");
+        const invisibleRootEnd: Comment = document.createComment("Controller node ends here.");
         parentNode.appendChild(invisibleRoot);
+        parentNode.appendChild(document.createElement("div"));
+        parentNode.appendChild(invisibleRootEnd);
         this._beforeInsertNode = invisibleRoot;
+        this._afterInsertNode = invisibleRootEnd;
     }
-    set attributes(attributes: { name: string; value: string }[]) {
-        attributes.forEach((item) => {
-            this._template.rootElement.setAttribute(item.name, item.value);
-        });
-    }
+    // set attributes(attributes: { name: string; value: string }[]) {
+    //     attributes.forEach((item) => {
+    //         this._template.rootElement.setAttribute(item.name, item.value);
+    //     });
+    // }
 
-    get attributes(): NamedNodeMap {
-        return this._template.rootElement.attributes;
-    }
+    // get attributes(): NamedNodeMap {
+    //     return this._template.rootElement.attributes;
+    // }
 
     get model(): TModel {
         return this._model;
@@ -44,37 +49,43 @@ export abstract class Component<TModel extends DomObservableModel> {
         elemNode.setAttribute("style", "all: initial;");
         this._content = elemNode;
         this._domObserver();
-        let myModel: TModel;
-        myModel = this._model;
-        this._template.rootElement = this._template.generateTemplate(
+        this.updateView();
+    }
+
+    public updateView() {
+        let templateNode = this._template.generateTemplate(
             this,
-            myModel,
+            this.model,
             this._content.childNodes.length > 0 ? this._content : undefined
         ) as ComponentTemplate;
+        let elements = templateNode.getElements();
+        for (let i = 0; i < elements.length; i++) {
+            this._template.rootElement = elements[i];
+        }
         this._template.rootElement.is_component = true;
     }
 
     protected onInit(): void {}
 
     private _onNodeRemoval(mutation: MutationRecord, cls: Component<TModel>): void {
-        if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
-            if (Array.from(mutation.removedNodes).includes(cls._template.rootElement)) {
-                cls._referenceCounter--;
-                if (cls._referenceCounter === 0) {
-                    cls.dispose();
-                    cls._parentComponent = undefined;
-                    cls._template = undefined;
-                }
-            }
-        }
+        // if (mutation.type === "childList" && mutation.removedNodes.length > 0) {
+        //     if (Array.from(mutation.removedNodes).includes(cls._template.rootElement)) {
+        //         cls._referenceCounter--;
+        //         if (cls._referenceCounter === 0) {
+        //             cls.dispose();
+        //             cls._parentComponent = undefined;
+        //             cls._template = undefined;
+        //         }
+        //     }
+        // }
     }
 
     private _onNodeAdd(mutation: MutationRecord, cls: Component<TModel>): void {
-        if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
-            if (Array.from(mutation.addedNodes).includes(cls._template.rootElement)) {
-                cls._referenceCounter++;
-            }
-        }
+        // if (mutation.type === "childList" && mutation.addedNodes.length > 0) {
+        //     if (Array.from(mutation.addedNodes).includes(cls._template.rootElement)) {
+        //         cls._referenceCounter++;
+        //     }
+        // }
     }
 
     private _observer: MutationObserver | null = null;
@@ -109,6 +120,10 @@ export abstract class Component<TModel extends DomObservableModel> {
 
     get element(): ComponentTemplate {
         return this._template.rootElement;
+    }
+
+    set element(elem: HTMLElement) {
+        this._template.rootElement = elem;
     }
 
     get template(): Template<TModel> {

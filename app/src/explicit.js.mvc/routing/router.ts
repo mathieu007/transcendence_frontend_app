@@ -50,7 +50,6 @@ class RouteContainer {
 }
 
 class RouteData {
-
     constructor(data?: Partial<RouteData>) {
         Object.assign(this, data);
     }
@@ -152,13 +151,20 @@ function getParameters(urlParts: string[]): string[] {
 function countUrlParts(urlsParts: string[]): number {
     let count = 0;
     if (urlsParts.length === 0) return 0;
-    urlsParts.forEach(e => {
-        if (e.trim() !== "")
-            count++;
+    urlsParts.forEach((e) => {
+        if (e.trim() !== "") count++;
     });
-    if (count === 0)
-        count = 1;
     return count;
+}
+
+function urlPartsTrim(urlsParts: string[]): string[] {
+    let count = 0;
+    let strings: string[] = [];
+    if (urlsParts.length === 0) return strings;
+    urlsParts.forEach((e, i) => {
+        if (e.trim() !== "") strings.push(urlsParts[i]);
+    });
+    return strings;
 }
 
 function recursiveGetMatchingUrlFromMap(
@@ -166,7 +172,21 @@ function recursiveGetMatchingUrlFromMap(
     concatPathName: string,
     matches: Array<RouteData>
 ): Array<RouteData> | undefined {
+    urlParts = urlPartsTrim(urlParts);
     let partsCount = countUrlParts(urlParts);
+    if (partsCount === 0) {
+        let currentUrl = "/";
+        for (let [pathName, routeArr] of routes) {
+            if (pathName.startsWith(currentUrl)) {
+                for (var i = 0; i < routeArr.length; i++) {
+                    let route = routeArr[i];
+                    matches.push(route);
+                    return matches;
+                }
+            }
+        }
+        return [];
+    }
     let pI = 0;
     for (pI = 0; pI < partsCount; pI++) {
         let elem = urlParts[pI];
@@ -177,11 +197,13 @@ function recursiveGetMatchingUrlFromMap(
                 for (var i = 0; i < routeArr.length; i++) {
                     let route = routeArr[i];
                     matches.push(route);
-                    if (pathName === currentUrl && partsCount === 1) {
-                        return matches;
-                    }
+                    // if (pathName === currentUrl && partsCount === pI + 1) {
+                    //     return matches;
+                    // }
                 }
             }
+        }
+        for (let [pathName, routeArr] of routes) {
             if (matches.length === 0) {
                 currentUrl = concatPathName + "/" + paramPlaceholder;
                 for (let [pathName, routeArr] of routes) {
@@ -189,22 +211,19 @@ function recursiveGetMatchingUrlFromMap(
                         for (var i = 0; i < routeArr.length; i++) {
                             let route = routeArr[i];
                             matches.push(route);
-                            if (pathName === currentUrl && partsCount === 1) {
-                                return matches;
-                            }
-                        };
+                            // if (pathName === currentUrl && partsCount === pI + 1) {
+                            //     return matches;
+                            // }
+                        }
                     }
                 }
             }
-            if (matches.length === 0) return undefined;
-            urlParts = urlParts.splice(0, 1);
-            if (urlParts.length === 0)
-                return matches;
-            if (urlParts.length === 1 && urlParts[0].trim() === "")
-                return matches;
-            return recursiveGetMatchingUrl(urlParts, concatPathName, matches);
         }
-        return [];
+        if (matches.length === 0) return undefined;
+        urlParts.shift();
+        if (urlParts.length === 0) return matches;
+        if (urlParts.length === 1 && urlParts[0].trim() === "") return matches;
+        return recursiveGetMatchingUrl(urlParts, concatPathName, matches);
     }
 }
 
@@ -231,7 +250,7 @@ function recursiveGetMatchingUrl(
                 if (route.signature.startsWith(currentUrl)) {
                     matches2.push(route);
                 }
-            };
+            }
         }
         if (matches2.length === 0) return undefined;
         urlParts = urlParts.splice(0, 1);
@@ -245,7 +264,7 @@ function recursiveGetMatchingUrl(
 
 // !important, without base address...
 function tryGetMatchingRoute(urlPathName: string): RouteData | undefined {
-    let urlParts = urlPathName.split("/",);
+    let urlParts = urlPathName.split("/");
     let concatPathName = "";
     let matches: Array<RouteData> = new Array();
     matches = recursiveGetMatchingUrlFromMap(urlParts, concatPathName, matches);
@@ -322,8 +341,7 @@ function findRoute(signature: string, pathRoutes: RouteData[]): RouteData | unde
     let queryStr = new URLSearchParams(url.search);
     if (pathRoutes !== undefined) {
         let keys = Array.from(queryStr.keys()).sort();
-        if (keys.length === 0)
-            return pathRoutes[0];
+        if (keys.length === 0) return pathRoutes[0];
         let index = findBestMatchingRoute(pathRoutes, keys);
         if (index === -1) {
             return undefined;
@@ -391,8 +409,7 @@ function initRouting(target: any, callStack: CallStack, route: RouteData, origin
 function findBestMatchingRoute(routes: RouteData[], toFind: Array<string>): number {
     let maxMatches = 0;
     let bestMatchIndex = -1;
-    if (toFind.length === 0)
-        return 0;
+    if (toFind.length === 0) return 0;
     routes.forEach((item, index) => {
         const matches = item.queryMatches.filter((element) => toFind.includes(element)).length;
         if (matches > maxMatches) {
@@ -495,7 +512,6 @@ function updateLayoutController(route: RouteData): void {
     if (app.model.active_layout !== controller.instance.layout || app.model.active_layout === undefined) {
         app.model.active_layout = controller.instance.layout;
         document.body.replaceChildren(controller.instance.layout.element);
-        controller.instance.layout.insertControllerNode(controller.instance.element);
     }
 }
 
@@ -521,15 +537,18 @@ function dispatchRouting(instance: any, originalMethod: any, callStack: CallStac
             returnAbsolute: true,
             includeQueryParams: true
         });
-        updateLayoutController(route);
         if (buildUrl !== currentUrl || firstLoad) {
+            updateLayoutController(route);
             firstLoad = false;
             if (route.history) history.pushState(route, "", buildUrl);
             else history.replaceState(route, "", buildUrl);
-            return -1;
+            let container = route.getContainer();
+            let controller = container.controller;
+            controller.instance.layout.insertControllerNode(controller.instance.element);
+            return 0;
         }
     }
-    return 0;
+    return -1;
 }
 
 const controllerRoutes: Map<
@@ -727,7 +746,8 @@ export class Router {
         if (urlParts.length >= 2) {
             for (let i = 0; i < urlParts.length; i += 2) {
                 url += urlParts[i];
-                if (urlParts.length > i + 1 && !isObjectType(route.context.args[argIndex])) url += route.context.args[argIndex];
+                if (urlParts.length > i + 1 && !isObjectType(route.context.args[argIndex]))
+                    url += route.context.args[argIndex];
                 argIndex++;
             }
         } else {
@@ -788,9 +808,14 @@ export class Router {
         dispatchRoute(route);
     }
 
-    static invokeDynamicControllerMethod(instance: any, methodName: string, args: (string | number | bigint | QueryParameter)[]): void {
+    static invokeDynamicControllerMethod(
+        instance: any,
+        methodName: string,
+        args: (string | number | bigint | QueryParameter)[]
+    ): void {
         const method = instance[methodName];
-        if (typeof method !== "function") throw new Error(`Method ${methodName} not found on instance of ${instance.constructor.name}`);
+        if (typeof method !== "function")
+            throw new Error(`Method ${methodName} not found on instance of ${instance.constructor.name}`);
         return method.apply(instance, args);
     }
 
@@ -805,6 +830,7 @@ function dispatchRoute(route: RouteData): void {
     updateLayoutController(route);
     let controller = route.getContainer().controller;
     Router.invokeDynamicControllerMethod(controller.instance, route.methodName, route.context.args);
+    controller.instance.layout.insertControllerNode(controller.instance.element);
 }
 
 window.addEventListener("popstate", function (e) {
@@ -814,21 +840,27 @@ window.addEventListener("popstate", function (e) {
     } else throw new Error("Unexpected state: " + e.state);
 });
 
-document.addEventListener("click", (e) => {
-    const target = e.target as HTMLAnchorElement;
-    if (target.tagName === "A") {
-        e.preventDefault();
-        let url = target.getAttribute("href");
-        if (Url.isCurrentWebsiteUrl(url)) {
-            url = Url.normalize(url, {
-                returnAbsolute: true,
-                removeTrailingSlash: false,
-                includeQueryParams: true
-            });
-            Router.navigate(url);
-        } else {
-            // send a warning to the user.
-            window.open(url, "_blank");
+document.body.addEventListener("click", function (e: MouseEvent) {
+    // const target = e.target as HTMLAnchorElement;
+    let target: HTMLElement | null = e.target as HTMLElement;
+    while (target && target !== this) {
+        if (target.matches("a")) {
+            target = target as HTMLAnchorElement;
+            e.preventDefault();
+            let url = target.getAttribute("href");
+            if (Url.isCurrentWebsiteUrl(url)) {
+                url = Url.normalize(url, {
+                    returnAbsolute: true,
+                    removeTrailingSlash: false,
+                    includeQueryParams: true
+                });
+                Router.navigate(url);
+            } else {
+                window.open(url, "_blank");
+            }
+            break;
         }
+        target = target.parentElement;
     }
+    e.preventDefault();
 });

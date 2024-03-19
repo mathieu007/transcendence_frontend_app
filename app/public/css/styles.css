@@ -654,10 +654,12 @@ progress {
   }
 }
 
-.trans-backgroud {
+.trans-background {
   background-color: var(--bs-body-bg);
   opacity: 0.9;
+  position: fixed;
 }
+
 .container,
 .container-fluid,
 .container-xxl,

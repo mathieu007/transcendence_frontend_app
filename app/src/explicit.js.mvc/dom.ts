@@ -1,15 +1,25 @@
-function insertAt(parent: Node, index: number, newNode: Node): void {
+export type HTMLString = string;
+
+export function insertAt(parent: Node, index: number, newNode: Node): void {
     const referenceNode = parent.childNodes[index] || null;
     parent.insertBefore(newNode, referenceNode);
 }
 
-function removeAt(parent: Node, index: number): void {
+export function insertAfter(targetNode: Node, newNode: Node): void {
+    if (targetNode.nextSibling) {
+        targetNode.parentNode.insertBefore(newNode, targetNode.nextSibling);
+    } else {
+        targetNode.parentNode.appendChild(newNode);
+    }
+}
+
+export function removeAt(parent: Node, index: number): void {
     if (parent.childNodes[index]) {
         parent.removeChild(parent.childNodes[index]);
     }
 }
 
-function replaceElementAtIndex(parent, newIndex, newElement) {
+export function replaceElementAtIndex(parent, newIndex, newElement) {
     if (newIndex < 0 || newIndex >= parent.children.length) {
         console.error("Index out of bounds");
         return;
@@ -26,18 +36,18 @@ function replaceElementAtIndex(parent, newIndex, newElement) {
     }
 }
 
-function getChildIndex(node) {
+export function getChildIndex(node) {
     return Array.prototype.indexOf.call(node.parentNode.children, node);
 }
 
-function existAt(parent: Node, index: number): boolean {
+export function existAt(parent: Node, index: number): boolean {
     if (parent.childNodes[index]) {
         return true;
     }
     return false;
 }
 
-function textNodeAtEqual(parent: Node, index: number, textToComapre: string): boolean {
+export function textNodeAtEqual(parent: Node, index: number, textToComapre: string): boolean {
     if (
         parent.childNodes[index] &&
         parent.childNodes[index] instanceof Text &&

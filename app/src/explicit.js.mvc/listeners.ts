@@ -8,12 +8,19 @@ export class Listeners {
     private static _inputListenersFunc: Map<string, () => void> = new Map();
     public static addClickListener() {
         document.addEventListener("click", (event) => {
-            if (
-                event.target instanceof Element &&
-                event.target.getAttribute("click")
-            ) {
-                const key = event.target.getAttribute("click");
-                Listeners.execClick(key);
+            let targetElement = event.target as HTMLElement;
+            while (targetElement && targetElement !== document.body) {
+                if (targetElement.hasAttribute("click")) {
+                    console.log("Clicked element with 'click' attribute:", targetElement.getAttribute("click"));
+                    break;
+                }
+                targetElement = targetElement.parentElement as HTMLElement;
+            }
+            if (targetElement.hasAttribute("click")) {
+                if (targetElement instanceof Element) {
+                    const key = targetElement.getAttribute("click");
+                    Listeners.execClick(key);
+                }
             }
         });
     }
@@ -26,10 +33,7 @@ export class Listeners {
 
     public static addChangeListener() {
         document.addEventListener("change", (event) => {
-            if (
-                event.target instanceof Element &&
-                event.target.getAttribute("change")
-            ) {
+            if (event.target instanceof Element && event.target.getAttribute("change")) {
                 const key = event.target.getAttribute("change");
                 Listeners.execChange(key);
             }
@@ -38,39 +42,24 @@ export class Listeners {
 
     public static addInputListener() {
         document.addEventListener("input", (event) => {
-            if (
-                event.target instanceof Element &&
-                event.target.getAttribute("input")
-            ) {
+            if (event.target instanceof Element && event.target.getAttribute("input")) {
                 const key = event.target.getAttribute("input");
                 Listeners.execInput(key);
             }
         });
     }
 
-    public static addClickListenerFunc(
-        elem: Element,
-        key: string,
-        func: () => void
-    ): void {
+    public static addClickListenerFunc(elem: Element, key: string, func: () => void): void {
         elem.setAttribute("click", key);
         Listeners._clickListenersFunc.set(key, func);
     }
 
-    public static addChangeListenerFunc(
-        elem: Element,
-        key: string,
-        func: () => void
-    ): void {
+    public static addChangeListenerFunc(elem: Element, key: string, func: () => void): void {
         elem.setAttribute("change", key);
         Listeners._changeListenersFunc.set(key, func);
     }
 
-    public static addInputListenerFunc(
-        elem: Element,
-        key: string,
-        func: () => void
-    ): void {
+    public static addInputListenerFunc(elem: Element, key: string, func: () => void): void {
         elem.setAttribute("input", key);
         Listeners._inputListenersFunc.set(key, func);
     }

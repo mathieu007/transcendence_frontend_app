@@ -5,6 +5,8 @@
   "dependencies": {
     "@types/htmlparser2": "^3.10.7",
     "@types/jsdom": "^21.1.6",
+    "acorn": "^8.11.3",
+    "acorn-walk": "^8.3.2",
     "fb-watchman": "^2.0.2",
     "htmlparser2": "^9.1.0",
     "jsdom": "^24.0.0",

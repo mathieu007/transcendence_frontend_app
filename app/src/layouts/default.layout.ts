@@ -13,5 +13,23 @@ export class DefaultLayout extends Layout<LayoutDefaultModel> {
         @inject("LayoutDefaultTemplate", LayoutDefaultTemplate) template: LayoutDefaultTemplate
     ) {
         super(app, model, template);
+        // const n = 100;
+        // window.addEventListener("scroll", () => {
+        //     if (window.scrollY >= n) {
+        //         this._model.data.main_menu = "hidden";
+        //     } else {
+        //         this._model.data.main_menu = "visible";
+        //     }
+        // });
+    }
+
+    public mobile_toggle_menu() {
+        if (this._model.mobile_menu === "visible") {
+            this._model.data.mobile_menu = "hidden";
+            this._model.data.main_menu = "visible";
+        } else {
+            this._model.data.mobile_menu = "visible";
+            this._model.data.main_menu = "hidden";
+        }
     }
 }

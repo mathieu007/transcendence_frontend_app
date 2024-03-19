@@ -280,10 +280,10 @@ $main-color: $blue;
   
 }
 
-.trans-backgroud 
+.trans-background 
 {
-   @include background-opacity($body-bg-dark, 0.9);    
-   position: absolute;
+   @include background-opacity($body-bg-dark, 0.9);
+   position: fixed;
    width: 100%;
    z-index: 100;
 }

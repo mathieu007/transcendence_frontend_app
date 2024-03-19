@@ -4,19 +4,88 @@ import type { DefaultLayout } from "@layout/default";
 import { LayoutDefaultModel } from "@model/layout/default";
 
 export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
-	public generateTemplate(layout: DefaultLayout, model: LayoutDefaultModel): TemplateNode {
-		return /*html*/ `
+    public generateTemplate(layout: DefaultLayout, model: LayoutDefaultModel): TemplateNode {
+        return /*html*/ `
         <div>
-        	<div class="trans-backgroud">
+		<div class="mobile-menu-overlay ${model.mobile_menu}"></div>
+  		<div class="container glowing-left-border d-flex flex-column flex-shrink-0 p-3 text-white bg-dark mobile-menu-container ${model.mobile_menu}">
+  		<div class="d-flex flex-wrap align-items-center justify-content-center justify-content-between">	
+			<a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
+        		<img class="logo change-color" src="${model.logo}" width="48" />
+        	</a>
+			<i click="${layout.mobile_toggle_menu()}" class="fa-solid fa-xmark close-button"></i>
+		</div>
+  			<hr>
+  			<ul class="nav nav-pills flex-column mb-auto">
+  				<li class="nav-item">
+  					<a href="#" class="nav-link active" aria-current="page">
+  						<svg class="bi me-2" width="16" height="16">
+  							<use xlink:href="#home"></use>
+  						</svg>
+  						Home
+  					</a>
+  				</li>
+  				<li>
+  					<a href="#" class="nav-link text-white">
+  						<svg class="bi me-2" width="16" height="16">
+  							<use xlink:href="#speedometer2"></use>
+  						</svg>
+  						Dashboard
+  					</a>
+  				</li>
+  				<li>
+  					<a href="#" class="nav-link text-white">
+  						<svg class="bi me-2" width="16" height="16">
+  							<use xlink:href="#table"></use>
+  						</svg>
+  						Orders
+  					</a>
+  				</li>
+  				<li>
+  					<a href="#" class="nav-link text-white">
+  						<svg class="bi me-2" width="16" height="16">
+  							<use xlink:href="#grid"></use>
+  						</svg>
+  						Products
+  					</a>
+  				</li>
+  				<li>
+  					<a href="#" class="nav-link text-white">
+  						<svg class="bi me-2" width="16" height="16">
+  							<use xlink:href="#people-circle"></use>
+  						</svg>
+  						Customers
+  					</a>
+  				</li>
+  			</ul>
+  			<hr>
+  			<div class="dropdown">
+  				<a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+  					id="dropdownUser1" data-bs-toggle="dropdown" aria-expanded="false">
+  					<img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+  					<strong>mdo</strong>
+  				</a>
+  				<ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="dropdownUser1">
+  					<li><a class="dropdown-item" href="#">New project...</a></li>
+  					<li><a class="dropdown-item" href="#">Settings</a></li>
+  					<li><a class="dropdown-item" href="#">Profile</a></li>
+  					<li>
+  						<hr class="dropdown-divider">
+  					</li>
+  					<li><a class="dropdown-item" href="#">Sign out</a></li>
+  				</ul>
+  			</div>
+  		</div>
+        	<div class="trans-background glowing-bottom-border ${model.main_menu}">
         		<div class="container">
         			<header
-        				class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3">
-        				<div class="col-md-3 mb-2 mb-md-0">
+        				class="d-flex flex-wrap align-items-center justify-content-center justify-content-between py-3">
+        				<div class="logo-cont col-3 mb-md-0">
         					<a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-        						<img class="logo change-color" src="/assets/img/logo.svg.convert.svg" width="32" />
+        						<img class="logo change-color" src="${model.logo}" width="48" />
         					</a>
         				</div>
-        				<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
+        				<ul class="main-menu-cont nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
         					<li><a href="/" class="nav-link px-2 link-secondary">Home</a></li>
         					<li><a href="/#" class="nav-link px-2">Features</a></li>
         					<li><a href="/#" class="nav-link px-2">Pricing</a></li>
@@ -24,44 +93,34 @@ export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
         					<li><a href="/#about" class="nav-link px-2">About</a></li>
         					<li><a href="/#contact" class="nav-link px-2">Contact Us</a></li>
         				</ul>
-        				<ul class="nav col-md-3 justify-content-end text-end">
+        				<ul class="sign-cont nav col-md-3 justify-content-end text-end">
         					<li>
         						<a type="button" role="button" href="/login"
         							class="btn btn-outline-primary me-2"><span>Login</span></a>
         					</li>
         					<li>
-        						<a type="button" role="button" href="/#signup" class="btn btn-primary me-2"><span>Sign-up</span></a>
+        						<a type="button" role="button" href="/register" class="btn btn-primary me-2"><span>Sign-up</span></a>
         					</li>
         					<li>
-								<div style="height:100%" class="dropdown text-end d-flex align-items-center justify-content-center">
-									<a class="d-block mx-auto link-body-emphasis text-decoration-none dropdown-toggle" id="navbarDropdown" href="#" role="button"
-        								data-bs-toggle="dropdown" aria-expanded="false"><i
-        									class="fa-regular fa-user fa-fw"></i>
-									</a>
-									<ul class="dropdown-menu text-small" style="">
-										<li><a class="dropdown-item" href="#">New project...</a></li>
-										<li><a class="dropdown-item" href="#">Settings</a></li>
-										<li><a class="dropdown-item" href="#">Profile</a></li>
-										<li>
-											<hr class="dropdown-divider">
-										</li>
-										<li><a class="dropdown-item" href="#">Sign out</a></li>
-									</ul>
-								</div>
+								<a type="button" role="button" class="btn btn-white" href="#">
+									<i class="fa-regular fa-user fa-fw"></i>
+								</a>
         					</li>
         				</ul>
+						<div class="mobile-menu">
+							<button type="button" role="button" click="${layout.mobile_toggle_menu()}" class="btn btn-primary me-2"><i class="fa-solid fa-bars"></i></a>
+						</div>
         			</header>
         		</div>
         	</div>
-
         	<controller-component></controller-component>
-			<div class="content-wrap">
-			<div class="mpl-box-md">
-                    <div class="container">
+			<div class="glowing-top-border wrapper">
+                <div class="container col-xxl-10 col-lg-12 px-4 py-5">
                         <div class="row hgap-lg vgap-lg">
                             <div class="col-12 col-lg-5">
                                 <h2>Contact Us</h2>
-                                <p>After moved, male won't Moveth moveth fruitful don't forth you bearing morning made male without life be blessed rule stars divided two. Firmament of, him she'd good of his morning.</p>
+                                <p>Whether you're curious about our upcoming projects, interested in collaborating, or simply want to share your thoughts, we're all ears! Our team thrives on feedback and is always eager to connect with fellow gaming enthusiasts.
+Please fill out the form below with your details and message. Whether it's a question, feedback, or a brilliant idea you'd like to share, we're looking forward to hearing from you!</p>
                                 <ul class="mpl-list mpl-list-horizontal list-hgap list-vgap mt-30">
                                     <li>
                                         <a href="#" class="text-1">
@@ -87,7 +146,7 @@ export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
                                 </ul>
                             </div>
                             <div class="col-12 col-lg-7">
-                                <form action="php/ajax-contact-form.php" method="POST" role="form" class="mpl-form-ajax row vgap" data-toggle="validator" novalidate="true">
+                                <form action="action/" method="POST" role="form" class="row vgap" data-toggle="validator" novalidate="true">
                                     <div class="col-12 col-md-6">
                                         <input class="form-control" type="text" id="contact_name" name="name" placeholder="Name" required=""><span class="form-control-bg"></span>
                                     </div>
@@ -98,18 +157,18 @@ export class LayoutDefaultTemplate extends LayoutTemplate<LayoutDefaultModel> {
                                         <textarea class="form-control" rows="5" id="contact_message" name="message" placeholder="Message" required=""></textarea>
                                     </div>
                                     <div class="col-12">
-                                        <button type="submit" class="btn btn-md disabled">Submit</button>
+										
+                                        <button type="submit" class="btn btn-lg btn-primary"><span>Submit</span></button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
-                </div>
-	</div>
+			</div>
         	<!-- <link href="/css/styles.css" rel="stylesheet" /> -->
         	<link href="/fontawesome/css/fontawesome.min.css" rel="stylesheet" />
         	<link href="/fontawesome/css/regular.min.css" rel="stylesheet" />
         	<link href="/fontawesome/css/solid.min.css" rel="stylesheet" />			
         </div>`;
-	}
+    }
 }

@@ -18,8 +18,8 @@ export class LoginController extends Controller<App, DefaultHeader, DefaultLayou
     ) {
         super(app, header, layout, model, template);
     }
-    // @Route("/login")
-    // public login(): void {
-    //     console.log("LoginController.login()");
-    // }
+    @Route("/login")
+    public login(): void {
+        console.log("LoginController.login()");
+    }
 }

@@ -46,10 +46,12 @@ client.capabilityCheck({ optional: [], required: ["relative_root"] }, (error) =>
             if (resp.subscription === subName) {
                 resp.files.forEach(async (file) => {
                     const filePath = `${sourceDir}/${file.name}`;
-                    if (!file.exists) {
-                        processTemplateFile(filePath, true);
-                    } else {
-                        processTemplateFile(filePath, false);
+                    if (file.name.indexOf("home") >= 0) {
+                        if (!file.exists) {
+                            processTemplateFile(filePath, true);
+                        } else {
+                            processTemplateFile(filePath, false);
+                        }
                     }
                 });
             }

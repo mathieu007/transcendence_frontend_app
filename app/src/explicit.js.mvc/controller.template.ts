@@ -16,12 +16,12 @@ export abstract class ControllerTemplate<TModel extends DomObservableModel> exte
         layout?: Layout<LayoutModel>
     ): TemplateNode;
 
-    get rootElement(): ComponentTemplate {
-        return this._templateElement as ComponentTemplate;
-    }
+    // get rootElement(): ComponentTemplate {
+    //     return this._rootTemplateElement as ComponentTemplate;
+    // }
 
-    set rootElement(template: Element) {
-        this._templateElement = template as ComponentTemplate;
-        this._templateElement.is_component = true;
-    }
+    // set rootElement(template: Element) {
+    //     this._rootTemplateElement = template as ComponentTemplate;
+    //     this._rootTemplateElement.is_component = true;
+    // }
 }

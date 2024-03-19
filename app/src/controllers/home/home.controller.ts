@@ -22,13 +22,9 @@ export class HomeController extends Controller<App, DefaultHeader, DefaultLayout
     public index(): void {
         console.log("HomeController.index()");
     }
-    // @Route("/test/${id}")
-    // public test(id: number): void {
-    //     console.log("HomeController.test(id)");
-    // }
     @Query(["filter", "page"])
-    @HistoryEnabled(false)
-    @Route("/testtttt/${id}")
+    // @HistoryEnabled(false)
+    @Route("/test/${id}")
     public testFilter(id: number, q: QueryParameter): void {
         console.log(`going to routes: /test/${id}?page=${q.page}&filter=${q.filter}`);
     }

@@ -3,7 +3,7 @@ import { Popover } from "bootstrap";
 import { Container } from "@explicit.js.mvc/di/container";
 import { App } from "@app";
 import { Routes } from "@explicit.js.mvc/routing/routes";
-import { QueryParameter, Router } from "@explicit.js.mvc/routing/router";
+import { QueryParameter, Route, Router, Url } from "@explicit.js.mvc/routing/router";
 import { HomeController } from "@controller/home/home";
 
 Router.register("HomeController", HomeController);
@@ -11,7 +11,7 @@ let routes = new Routes();
 App.routes = routes;
 Container.register("App", App);
 let home = Container.register("HomeController", HomeController);
-App.routes.home.testFilter(2, { page: 1, filter: "Math" });
+Router.navigate(Url.getCurrentUrl());
 
 document.querySelectorAll('[data-bs-toggle="popover"]').forEach((popover) => {
     new Popover(popover);

@@ -6,11 +6,15 @@ import { isObjectType, isPrimitive, removeByReference } from "./utils";
 // 	(this: Component, data: T, property: string | symbol, oldValue: object, newValue: object): void;
 // }
 
+export class FunctionObservable {}
+
 export class DomObservableModel extends DomNodeModelBinding {
     private _observable: Observable<DomObservableModel>;
+    public data: any;
     constructor() {
         super();
         this._observable = new Observable<DomObservableModel>(this);
+        this.data = this._observable.data;
     }
 }
 
@@ -24,7 +28,7 @@ export class Observable<T extends DomNodeModelBinding> {
         string,
         (data: T, property: string | symbol, oldValue: object, newValue: object) => void
     > = new Map();
-    private _data: T;
+    public _data: T;
 
     constructor(data: T) {
         this._data = this.createObservable(data);
@@ -80,9 +84,10 @@ export class Observable<T extends DomNodeModelBinding> {
         // if (Array.isArray(target) && !isNaN(Number(property))) {
         //     this.setArrayValue(target, property, newValue, tryFireCallbacks);
         // }
-        if (isPrimitive(newValue)) {
-            this.setPrimitiveValue(target, property, newValue, tryFireCallbacks);
-        }
+        // if (isPrimitive(newValue)) {
+        //     this.setPrimitiveValue(target, property, newValue, tryFireCallbacks);
+        // }
+        target[property as keyof T] = newValue;
     }
 
     private fireCallBacks(target: T, property: string, oldValue: any, newValue: any, tryFireCallbacks: boolean): void {
@@ -101,10 +106,10 @@ export class Observable<T extends DomNodeModelBinding> {
     }
 
     public hasDomNodeBinding(objName: string, propertyName: string): boolean {
-        return (
-            !DomNodeModelBinding.includedProperties.has(objName) ||
-            DomNodeModelBinding.includedProperties.get(objName)?.indexOf(propertyName) === -1
-        );
+        let model = DomNodeModelBinding.includedProperties.get(objName);
+        if (!model) return false;
+        let index = model.indexOf(propertyName);
+        if (index >= 0) return true;
     }
 
     private createObservable(data: T): T {

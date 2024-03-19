@@ -8,7 +8,13 @@ export class LayoutDefaultModel extends DomObservableModel {
         super();
     }
     @DataBinding
+    logo: string = "/assets/img/logo.png";
+    @DataBinding
     top_menu: Array<TopMenuModel>;
     @DataBinding
     error_modal: ModalDefaultModel;
+    @DataBinding
+    mobile_menu: string = "hidden";
+    @DataBinding
+    main_menu: string = "visible";
 }
